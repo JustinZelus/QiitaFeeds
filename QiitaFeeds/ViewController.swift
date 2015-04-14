@@ -10,39 +10,39 @@ import UIKit
 import SVProgressHUD
 
 class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
-
-    var myItems: Array<String> = []
+    
+    var myItems: [[String: String]] = []
+    let qiitaApiModel: QiitaApiModel = QiitaApiModel()
+    var myTableView: UITableView = UITableView()
+    
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        qiitaApiModel.addObserver(self, forKeyPath: "articles", options: .New, context: nil)
+        qiitaApiModel.updateLists()
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
-        
-        let qiitaApiModel = QiitaApiModel()
-        myItems = qiitaApiModel.lists()
-        println(myItems)
-        
-        // Status Barの高さを取得する.
         let barHeight: CGFloat = UIApplication.sharedApplication().statusBarFrame.size.height
         
-        // Viewの高さと幅を取得する.
         let displayWidth: CGFloat = self.view.frame.width
         let displayHeight: CGFloat = self.view.frame.height
         
-        // TableViewの生成する(status barの高さ分ずらして表示).
-        let myTableView: UITableView = UITableView(frame: CGRect(x: 0, y: barHeight, width: displayWidth, height: displayHeight - barHeight))
-        
-        // Cell名の登録をおこなう.
+        myTableView = UITableView(frame: CGRect(x: 0, y: barHeight, width: displayWidth, height: displayHeight - barHeight))
         myTableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: "MyCell")
-        
-        // DataSourceの設定をする.
         myTableView.dataSource = self
-        
-        // Delegateを設定する.
         myTableView.delegate = self
-        
-        // Viewに追加する.
         self.view.addSubview(myTableView)
         
+    }
+    
+    override func observeValueForKeyPath(keyPath: String, ofObject object: AnyObject, change: [NSObject : AnyObject], context: UnsafeMutablePointer<Void>) {
+        if(keyPath == "articles"){
+            self.myItems = qiitaApiModel.lists()
+            self.myTableView.reloadData()
+        }
     }
 
     override func didReceiveMemoryWarning() {
@@ -50,31 +50,17 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         // Dispose of any resources that can be recreated.
     }
     
-    /*
-    Cellが選択された際に呼び出される.
-    */
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        println("Num: \(indexPath.row)")
-        println("Value: \(myItems[indexPath.row])")
+        println(myItems[indexPath.row]["uri"])
     }
     
-    /*
-    Cellの総数を返す.
-    */
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return myItems.count
     }
     
-    /*
-    Cellに値を設定する.
-    */
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        
-        // Cellの.を取得する.
-        let cell = tableView.dequeueReusableCellWithIdentifier("MyCell", forIndexPath: indexPath) as UITableViewCell
-        
-        // Cellに値を設定する.
-        cell.textLabel!.text = "\(myItems[indexPath.row])"
+        let cell = tableView.dequeueReusableCellWithIdentifier("MyCell", forIndexPath: indexPath) as! UITableViewCell
+        cell.textLabel!.text = myItems[indexPath.row]["title"]
         
         return cell
     }

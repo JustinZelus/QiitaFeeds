@@ -14,20 +14,35 @@ import Alamofire_SwiftyJSON
 
 class QiitaApiModel : NSObject{
     
-    dynamic var myItems: Array<String> = []
+    dynamic var articles: [[String: String]] = []
+    let api_uri = "https://qiita.com/api/v2/items"
     
     override init() {
     }
     
-    func lists() -> Array<String> {
-        Alamofire.request(.GET, "https://qiita.com/api/v2/items", parameters: nil)
-            .responseSwiftyJSON { (request, response, json, error) in
-                
-                let count:Int! = json.count
-                for var i = 0; i < count; i++ {
-                    self.myItems.append(json[i]["title"].string!)
+    func lists() -> [[String: String]]{
+        return self.articles
+    }
+    
+    func updateLists() {
+        var lists: [[String: String]] = []
+        Alamofire.request(.GET, self.api_uri, parameters: nil)
+            .responseJSON { (req, res, json, error) in
+                if(error != nil) {
+                    NSLog("Error: \(error)")
+                    println(req)
+                    println(res)
+                }
+                else {
+                    NSLog("Success: \(self.api_uri)")
+                    var json = JSON(json!)
+                    
+                    let count:Int! = json.count
+                    for var i = 0; i < count; i++ {
+                        lists.append(["title": json[i]["title"].string!, "uri": json[i]["url"].string!])
+                    }
+                    self.articles = lists
                 }
         }
-        return self.myItems
     }
 }

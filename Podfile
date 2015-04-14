@@ -6,8 +6,8 @@ use_frameworks!
 
 
 target 'QiitaFeeds' do
-  pod 'Alamofire', :git => "https://github.com/Alamofire/Alamofire.git", :tag => '1.1.5'
-  pod 'SwiftyJSON', :git => "https://github.com/SwiftyJSON/SwiftyJSON.git", :tag => '2.1.3'
+  pod 'Alamofire', :git => "https://github.com/Alamofire/Alamofire.git", :tag => '1.2.0'
+  pod 'SwiftyJSON', :git => "https://github.com/SwiftyJSON/SwiftyJSON.git", :tag => '2.2.0'
   pod 'Alamofire-SwiftyJSON', :git => "https://github.com/SwiftyJSON/Alamofire-SwiftyJSON.git"
   pod 'SVProgressHUD'
 end
