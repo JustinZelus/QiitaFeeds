@@ -11,9 +11,10 @@ import SVProgressHUD
 
 class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
-    var myItems: [[String: String]] = []
+    var articles: [[String: String]] = []
     let qiitaApiModel: QiitaApiModel = QiitaApiModel()
-    var myTableView: UITableView = UITableView()
+    var listView: ListView?
+//    var myTableView: UITableView = UITableView()
     
     
     override func viewWillAppear(animated: Bool) {
@@ -25,23 +26,17 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        let barHeight: CGFloat = UIApplication.sharedApplication().statusBarFrame.size.height
         
-        let displayWidth: CGFloat = self.view.frame.width
-        let displayHeight: CGFloat = self.view.frame.height
-        
-        myTableView = UITableView(frame: CGRect(x: 0, y: barHeight, width: displayWidth, height: displayHeight - barHeight))
-        myTableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: "MyCell")
-        myTableView.dataSource = self
-        myTableView.delegate = self
-        self.view.addSubview(myTableView)
+        listView = ListView(frame: self.view.bounds);
+        self.listView!.set(self)
+        self.view = self.listView
         
     }
     
     override func observeValueForKeyPath(keyPath: String, ofObject object: AnyObject, change: [NSObject : AnyObject], context: UnsafeMutablePointer<Void>) {
         if(keyPath == "articles"){
-            self.myItems = qiitaApiModel.lists()
-            self.myTableView.reloadData()
+            self.articles = qiitaApiModel.lists()
+            self.listView!.myTableView.reloadData()
         }
     }
 
@@ -51,16 +46,16 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        println(myItems[indexPath.row]["uri"])
+        println(articles[indexPath.row]["uri"])
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return myItems.count
+        return articles.count
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("MyCell", forIndexPath: indexPath) as! UITableViewCell
-        cell.textLabel!.text = myItems[indexPath.row]["title"]
+        cell.textLabel!.text = articles[indexPath.row]["title"]
         
         return cell
     }
