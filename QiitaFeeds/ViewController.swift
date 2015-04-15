@@ -14,8 +14,6 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     var articles: [[String: String]] = []
     let qiitaApiModel: QiitaApiModel = QiitaApiModel()
     var listView: ListView?
-//    var myTableView: UITableView = UITableView()
-    
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
@@ -47,6 +45,10 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         println(articles[indexPath.row]["uri"])
+        
+        let detailView: DetailViewController = DetailViewController()
+        detailView.targetURL = articles[indexPath.row]["uri"]!
+        self.presentViewController(detailView, animated: true, completion: nil)
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
